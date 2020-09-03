@@ -37,16 +37,18 @@
     /*
      case1  执行完毕后线程就会立即销毁
      */
-    NSThread *thread1 = [[XThread alloc] initWithTarget:self selector:@selector(thread1Excute) object:nil];
-    [thread1 start];
+//    XThread *thread1 = [[XThread alloc] initWithTarget:self selector:@selector(thread1Excute) object:nil];
+//    [thread1 start];
 
     /*
      case2:
      子线程中默认没有开启runloop, 所以即使是被controller强引用, 线程内任务执行完毕后也不能再次执行其他任务, 类似僵尸对象跟着controller的销毁一起销毁;
      */
-//    self.thread2 = [[XThread alloc] initWithTarget:self selector:@selector(thread2Excute) object:nil];
+//    self.thread2 = [[XThread alloc] initWithBlock:^{
+//        NSLog(@"Thread2 执行");
+//    }];
 //    [self.thread2 start];
-    
+//
     
     
     
@@ -54,21 +56,21 @@
      case3:
      子线程中开启runloop, 为其添加任意的souce0/souce1/timer/observer, 并让其run, 则此线程由于runloop的关系就不会被销毁;
      */
-    self.thread3 = [[XThread alloc] initWithBlock:^{
-            /*
-         我们知道runloop中如果没有任何source0/souce1/timer/observer 则runloop会立即退出;
-         所以为runloop添加source1, 然后让runloop执行run;
-         */
-        [[NSRunLoop currentRunLoop] addPort:[[NSPort alloc]init ] forMode:NSDefaultRunLoopMode];
-        /*
-         注意run的释义:If no input sources or timers are attached to the run loop, this method exits immediately; otherwise, it runs the receiver in the NSDefaultRunLoopMode by repeatedly invoking runMode:beforeDate:. In other words, this method effectively begins an infinite loop that processes data from the run loop’s input sources and timers.
-         大致翻译:  如果没有souces或者timers添加到runloop中则方法理解退出; 如果有,将在NSDefaultRunLoopMode模式下无限次执行runMode:beforeDate:来处理添加的souces和timers;
-         注意: 调用 runloop 的 run 方法则不再能取消 runloop 即使是调用了CFRunLoopStop(CFRunLoopGetCurrent()); 也只是停了其中一次循环;
-
-         */
-        [[NSRunLoop currentRunLoop] run];
-    }];
-    [self.thread3 start];
+//    self.thread3 = [[XThread alloc] initWithBlock:^{
+//            /*
+//         我们知道runloop中如果没有任何source0/souce1/timer/observer 则runloop会立即退出;
+//         所以为runloop添加source1, 然后让runloop执行run;
+//         */
+//        [[NSRunLoop currentRunLoop] addPort:[[NSPort alloc]init ] forMode:NSDefaultRunLoopMode];
+//        /*
+//         注意run的释义:If no input sources or timers are attached to the run loop, this method exits immediately; otherwise, it runs the receiver in the NSDefaultRunLoopMode by repeatedly invoking runMode:beforeDate:. In other words, this method effectively begins an infinite loop that processes data from the run loop’s input sources and timers.
+//         大致翻译:  如果没有souces或者timers添加到runloop中则方法理解退出; 如果有,将在NSDefaultRunLoopMode模式下无限次执行runMode:beforeDate:来处理添加的souces和timers;
+//         注意: 调用 runloop 的 run 方法则不再能取消 runloop 即使是调用了CFRunLoopStop(CFRunLoopGetCurrent()); 也只是停了其中一次循环;
+//
+//         */
+//        [[NSRunLoop currentRunLoop] run];
+//    }];
+//    [self.thread3 start];
     
     
     
@@ -76,14 +78,14 @@
      case4:
      不使用 runloop 的 run 方法;  自己通过runMode:beforeDate:方法来控制 runloop 进而达到控制线程生命周期的目的;
      */
-//    self.runloopStop = NO;
-//    self.thread4 = [[XThread alloc] initWithBlock:^{
-//        [[NSRunLoop currentRunLoop] addPort:[[NSPort alloc]init] forMode:NSDefaultRunLoopMode];
-//        while (!weakSelf.runloopStop) {
-//            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-//        }
-//    }];
-//    [self.thread4 start];
+    self.runloopStop = NO;
+    self.thread4 = [[XThread alloc] initWithBlock:^{
+        [[NSRunLoop currentRunLoop] addPort:[[NSPort alloc]init] forMode:NSDefaultRunLoopMode];
+        while (!weakSelf.runloopStop) {
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+        }
+    }];
+    [self.thread4 start];
     
 }
 
@@ -105,6 +107,7 @@
     ///即使再次调用也没用, 因为子线程内没有开启runloop
     [self performSelector:@selector(thread2Excute) onThread:self.thread2 withObject:nil waitUntilDone:NO];
 }
+
 - (IBAction)thread2Kill:(id)sender {
 }
 
@@ -116,7 +119,7 @@
 }
 
 - (void)thread3Dealloc{
-    NSLog(@"thread3执行销毁");
+    NSLog(@"thread3 即将销毁?");
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
 - (IBAction)thread3Run:(id)sender {
@@ -151,7 +154,7 @@
 
 
 - (void)dealloc {
-    NSLog(@"ControllerDealloc:%s", __func__);
+    NSLog(@"ControllerDealloc: %s", __func__);
 }
 
 

@@ -63,6 +63,7 @@
 		760E8B2124BD467300F08A9D /* ViewController3.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController3.m; sourceTree = "<group>"; };
 		763E0C4B24C09F850005CA4B /* XThread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XThread.h; sourceTree = "<group>"; };
 		763E0C4C24C09F850005CA4B /* XThread.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XThread.m; sourceTree = "<group>"; };
+		763F65F12500D2D5005FA5AE /* ViewController3.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ViewController3.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -170,6 +171,7 @@
 			children = (
 				760E8B2024BD467300F08A9D /* ViewController3.h */,
 				760E8B2124BD467300F08A9D /* ViewController3.m */,
+				763F65F12500D2D5005FA5AE /* ViewController3.cpp */,
 				763E0C4B24C09F850005CA4B /* XThread.h */,
 				763E0C4C24C09F850005CA4B /* XThread.m */,
 			);
